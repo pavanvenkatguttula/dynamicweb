@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>User's Live Location on Map</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <style>
+      #map {
+        height: 100vh;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        if (navigator.geolocation) {
+          const map = L.map('map').setView([0, 0], 2);
+          
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+          }).addTo(map);
+          
+          const marker = L.marker([0, 0]).addTo(map)
+            .bindPopup('Your Location')
+            .openPopup();
+          
+          function updatePosition(position) {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            map.setView([lat, lng], 13);
+            marker.setLatLng([lat, lng]);
+            marker.getPopup().setContent(`Your Location: ${lat}, ${lng}`).openPopup();
+          }
+
+          navigator.geolocation.watchPosition(updatePosition, function(error) {
+            console.error('Error getting user location:', error);
+            alert('Unable to retrieve your location');
+          }, {
+            enableHighAccuracy: true,
+            maximumAge: 0,
+            timeout: 5000
+          });
+        } else {
+          alert('Geolocation is not supported by this browser.');
+        }
+      });
+    </script>
+  </body>
+</html>
